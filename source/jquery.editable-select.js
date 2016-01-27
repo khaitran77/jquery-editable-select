@@ -15,7 +15,7 @@
 	});
 	$.fn.editableSelect = function (options) {
 		var defaults = { filter: true, effect: 'default', duration: 'fast', onCreate: null, onShow: null, onHide: null, onSelect: null };
-		var select = this.clone(), input = $('<input type="text">'), list = $('<ul class="es-list">');
+		var select = this.clone(true, true), input = $('<input type="text">'), list = $('<ul class="es-list">');
 		options = $.extend({}, defaults, options);
 		switch (options.effects) {
 			case 'default': case 'fade': case 'slide': break;
@@ -97,12 +97,14 @@
 				list.css({ top: input.offset().top + input.outerHeight() - 1, left: input.offset().left, width: input.innerWidth() });
 				var hidden = options.filter ? list.find('li:nic(' + input.val() + ')').hide().size() : 0;
 				if (hidden == list.find('li').size()) list.hide();
-				else
+				else {
 					switch (options.effects) {
 						case 'fade':   list.fadeIn(options.duration); break;
 						case 'slide':  list.slideDown(options.duration); break;
 						default:       list.show(options.duration); break;
 					}
+					list.css('display', 'block'); // fix chrome issue
+				}
 				if (options.onShow) options.onShow.call(this, input);
 			},
 			hide: function () {
@@ -124,6 +126,7 @@
 			copyAttributes: function (from, to) {
 				var attrs = $(from)[0].attributes;
 				for (var i in attrs) $(to).attr(attrs[i].nodeName, attrs[i].nodeValue);
+				$(to).data($(from).data());
 			},
 			setField: function (es) {
 				if (!$(this).is('li:visible')) return false;
